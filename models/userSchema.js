@@ -28,11 +28,10 @@ const userSchema = new mongoose.Schema({
         min:18,
     },
     gender : {type: String,
-        validate(value){
-            if(!['male','female','other'].includes(value)){
-                throw new Error("gender data is not valid")
-            }
-        }
+        enum: {
+            values : ["male","female","other"],
+            message: `{VALUE} is not a valid gender type`,
+        },
     },
     photoUrl:{type:String,
         default: "https://pinnacle.works/dummy-image/"

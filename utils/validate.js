@@ -1,4 +1,5 @@
 const validator = require('validator');
+const bcrypt = require('bcrypt');
 
 const validateFields = (req) => {
     const user = req.body;
@@ -22,4 +23,32 @@ const validateFields = (req) => {
     }
 }
 
-module.exports = validateFields;
+const validateProfileFields = (req) => {
+    const editableFields = [
+        "firstName",
+        "lastName",
+        "age",
+        "photoUrl",
+        "about",
+        "skills",
+    ];
+
+    const isEditable = Object.keys(req.body).every((key)=>  editableFields.includes(key));
+    if(!isEditable){
+        throw new Error("Invalid fields provided for update");
+    }
+
+    return isEditable;
+}
+
+const validatePassword = async (req) => {
+    const currentPassword = req.user.password;
+
+        const loggedInUser = req.user;
+
+        const checkPassword = await bcrypt.compare(req.body.currentPassword, currentPassword);
+
+        return checkPassword;
+}
+
+module.exports = {validateFields, validateProfileFields, validatePassword};
