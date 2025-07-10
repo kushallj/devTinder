@@ -3,6 +3,7 @@ const requestRouter = express.Router();
 const {adminAuth} = require('../middleware/auth');
 const ConnectionRequest = require('../models/connectionRequest');
 const User = require('../models/userSchema');
+const { Connection } = require('mongoose');
 
 
 requestRouter.post('/request/:status/:toUserId',adminAuth, async (req,res) => {
@@ -48,5 +49,38 @@ requestRouter.post('/request/:status/:toUserId',adminAuth, async (req,res) => {
         console.log(err.message);
     }
 });
+
+requestRouter.post('/request/:status/:requestId',adminAuth, async (req,res) => {
+    try{
+        const loggedInUser = req.user;
+
+        const allowedStatus = ['accepted', 'rejected'];
+
+        const {status, requestId} = req.params;
+        if(!allowedStatus.includes(status)){
+            return res.status(400).json({message: 'Invalid status type: ' + status});
+        }
+
+        const connectionRequest = await ConnectionRequest.findOne({
+            _id: requestId,
+            toUserId: loggedInUser._id,
+            status: 'interested'
+        });
+
+        if(!connectionRequest || connectionRequest.length === 0){
+            return res.status(404).json({message: 'Connection Request not found'});
+        }
+
+        ConnectionRequest.status = status;
+
+        const data = await ConnectionRequest.save();
+
+        res.json({message: loggedInUser.firstName + ' has ' + status + ' the connection request', data});
+
+    } catch (err){
+        res.status(400).send("Error :"+err.message);
+        console.log(err.message);
+    }
+})
 
 module.exports = requestRouter;
