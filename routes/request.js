@@ -52,31 +52,35 @@ requestRouter.post('/request/:status/:toUserId',adminAuth, async (req,res) => {
 
 requestRouter.post('/request/:status/:requestId',adminAuth, async (req,res) => {
     try{
-        const loggedInUser = req.user;
+        const loogedInUser = req.user;
 
-        const allowedStatus = ['accepted', 'rejected'];
+        const allowedStatus = ["accepted","rejected"];
 
-        const {status, requestId} = req.params;
+        const status = req.params.status;
+
         if(!allowedStatus.includes(status)){
-            return res.status(400).json({message: 'Invalid status type: ' + status});
+            return res.status(400).json({message: "Status type is not allowed: "+status});
         }
 
         const connectionRequest = await ConnectionRequest.findOne({
-            _id: requestId,
-            toUserId: loggedInUser._id,
-            status: 'interested'
+            _id: req.params.requestId,
+            toUserId: loogedInUser._id,
+            status: "interested"
         });
+        if(!connectionRequest){
+            return res
+                  .status(404)
+                  .json({message: 'Connection Request not found or already processed!'
 
-        if(!connectionRequest || connectionRequest.length === 0){
-            return res.status(404).json({message: 'Connection Request not found'});
-        }
+                  });
+                }
+        connectionRequest.status = status;
+        const data =await connectionRequest.save();
 
-        ConnectionRequest.status = status;
-
-        const data = await ConnectionRequest.save();
-
-        res.json({message: loggedInUser.firstName + ' has ' + status + ' the connection request', data});
-
+        return res.json({
+            message: `Connection Request ${status} successfully`,
+            data
+     })
     } catch (err){
         res.status(400).send("Error :"+err.message);
         console.log(err.message);

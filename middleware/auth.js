@@ -8,7 +8,7 @@ const adminAuth = async (req,res,next)=>{
         throw new Error("token is not valid!!!!!!!!!!!!");
     }
 
-    const decodeObj = await jwt.verify(token, "DEV@Tinder");
+    const decodeObj = await jwt.verify(token, "DEV@Tinder",{expiresIn: "7d"});
 
     const {_id} = decodeObj;
 

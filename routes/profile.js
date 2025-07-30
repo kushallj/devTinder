@@ -31,7 +31,9 @@ profileRouter.get("/profile/view", adminAuth,async (req,res)=>{
 
         await loggedInUser.save();
 
-        res.send(`${loggedInUser.firstName}, your profile updated successfully`);
+        res.json({message:`${loggedInUser.firstName}, your profile updated successfully`,
+            data: loggedInUser
+        });
         
     } catch(err){
         res.status(400).send("Error : "+ err.message);

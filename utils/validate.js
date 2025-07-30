@@ -10,7 +10,7 @@ const validateFields = (req) => {
         throw new Error("FirstName should be between 4 to 50 characters");
     }
 
-    if(lastName.length<4 || lastName.length>50){
+    if(lastName.length<3 || lastName.length>50){
         throw new Error("lastName should be between 4 to 50 characters");
     }
 
