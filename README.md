@@ -34,3 +34,5 @@
 
 - Write code with proper validation for '/request/:status/:requestId'
 - post api vs get api thought process
+- Create get api for /user/connections
+

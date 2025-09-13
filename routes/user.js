@@ -28,6 +28,14 @@ userRouter.get('/user/request/received',adminAuth,async (req,res) => {
 userRouter.get('/user/connections',adminAuth, async (req,res) => {
     try {
         const loggedInUser = req.user;
+
+        const page = parseInt(req.query.page) || 1;
+        let limit = parseInt(req.query.limit) || 10;
+
+        const skip = (page - 1)*limit;
+
+        limit = limit > 50 ? 50 : limit;
+
         const connectionRequest = ConnectionRequest.find({
             $or:[
                 {toUserId: loggedInUser._id, status: "accepted"},
@@ -78,8 +86,10 @@ userRouter.get('/feed',adminAuth, async (req,res) => {
         }
         ],
     }).select(USER_SAFE_DATA)
+      .skip(skip)
+      .limit(limit)
 
-    res.send(users);
+    res.json({data: users});
 })
 
 module.exports = userRouter;
